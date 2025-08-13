@@ -31,6 +31,10 @@ void Snake::Setup() {
     nTail = 0;
 }
 
+int Snake::GetScore() {
+    return score;
+}
+
 void Snake::Draw() {
     clearTerminal();
     clearScreen();
@@ -133,5 +137,50 @@ void Snake::UpdateGame() {
         fruitX = rand() % width;  // Generate new fruit position
         fruitY = rand() % height;
         nTail++;  // Increase the length of the snake
+    }
+}
+
+int Snake::SetDifficulty() {
+    int dfc, choice;
+    cout << "Select difficulty level:  " << endl;
+    cout << "1. Easy" << endl;
+    cout << "2. Medium" << endl;
+    cout << "3. Hard" << endl;
+    
+    cin >> choice;
+
+    switch (choice) {
+        case 1: dfc = 200; break;
+        case 2: dfc = 100; break;
+        case 3: dfc = 50; break;
+        default: dfc = 100; break;
+    }
+    return dfc;
+}
+
+void Snake::Input() {
+    if (kbhit()) {
+        switch (getch()) {
+            case 'a':
+            case 'A':
+                dir = LEFT;
+                break;
+            case 'd':
+            case 'D':
+                dir = RIGHT;
+                break;
+            case 'w':
+            case 'W':
+                dir = UP;
+                break;
+            case 's':
+            case 'S':
+                dir = DOWN;
+                break;
+            case 'x':
+            case 'X':
+                game_over = true; // Exit the game
+                break;
+        }
     }
 }

@@ -5,24 +5,25 @@
 #include <cstdlib>    // for rand
 #include <ctime>      // for seeding rand
 #include "ultils.hpp"
+#include "snake.hpp"
 
 using namespace std;
 
 int main() {
-    srand(time(0));
-    Setup();
-    int dfc = setDifficulty();
-    enableNonBlockingInput();
+    Snake snake(20, 17);
+    snake.Setup();
+    int dfc = snake.SetDifficulty();
+    // enableNonBlockingInput();
 
-    while (!isGameOver) {
-        Draw();
-        Input();
-        UpdateGame();
+    while (!snake.IsGameOver()) {
+        snake.Draw();
+        snake.Input();
+        snake.UpdateGame();
         usleep(dfc);
     }
 
-    disableNonBlockingInput();
-    cout << "Game Over! Final score: " << score << "\n";
+    // disableNonBlockingInput();
+    cout << "Game Over! Final score: " << snake.GetScore() << "\n";
     return 0;
 }
     

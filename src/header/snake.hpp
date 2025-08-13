@@ -24,6 +24,6 @@ public:
     void Input();
     // void Logic();
     bool GameOver();
-    // int GetScore();
+    int GetScore();
     int SetDifficulty();
 };
