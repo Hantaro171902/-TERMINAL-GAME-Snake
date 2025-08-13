@@ -1,4 +1,6 @@
 file(REMOVE_RECURSE
+  "CMakeFiles/Snake.dir/src/color.cpp.o"
+  "CMakeFiles/Snake.dir/src/color.cpp.o.d"
   "CMakeFiles/Snake.dir/src/main.cpp.o"
   "CMakeFiles/Snake.dir/src/main.cpp.o.d"
   "CMakeFiles/Snake.dir/src/snake.cpp.o"

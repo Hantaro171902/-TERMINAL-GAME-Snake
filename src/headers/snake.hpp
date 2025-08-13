@@ -1,3 +1,4 @@
+// snake.hpp
 #pragma once 
 
 #include <iostream>
@@ -11,13 +12,16 @@ private:
     int x, y; // Snake head position
     int fruitX, fruitY; // Fruit position
     int score;
-    std::vector<int> tailX, tailY; // Snake tail positions
+    std::vector<int> tailX;
+    std::vector<int> tailY; // Snake tail positions
     int nTail; // Length of the snake tail
     SnakeDirection dir;
     bool game_over;
 
 public:
     Snake(int w, int h);
+    ~Snake();
+    
     void Setup();
     void Draw();
     void UpdateGame();

@@ -11,15 +11,40 @@
 
 using namespace std;
 
-Snake::Snake(int w, int h) : width(w), height(h), score(0), nTail(0), game_over(false) {
+namespace {
+    termios saved_termios;
+
+    void set_non_blocking_input() {
+        termios t;
+        tcgetattr(STDIN_FILENO, &saved_termios);
+        t = saved_termios;
+        t.c_lflag &= ~(ICANON | ECHO); // Disable canonical mode and echo
+        tcsetattr(STDIN_FILENO, TCSANOW, &t);
+        fcntl(STDIN_FILENO, F_SETFL, O_NONBLOCK); // Set non-blocking mode
+    }
+    
+    void reset_input() {
+        tcsetattr(STDIN_FILENO, TCSANOW, &saved_termios); // Restore original terminal
+    }
+}
+
+Snake::~Snake() {
+    reset_input();
+}
+
+Snake::Snake(int w, int h) : width(w), height(h) {
     x = width / 2;
     y = height / 2;
     fruitX = rand() % width;
     fruitY = rand() % height;
     dir = STOP;
+    tailX.resize(0);
+    tailY.resize(0);
 }
 
 void Snake::Setup() {
+    set_non_blocking_input();
+
     game_over = false;
     dir = STOP;
     x = width / 2;
@@ -28,6 +53,8 @@ void Snake::Setup() {
     fruitY = rand() % height;
     score = 0;
     nTail = 0;
+    tailX.resize(0);
+    tailY.resize(0);
 }
 
 int Snake::GetScore() {
@@ -91,26 +118,30 @@ void Snake::Draw() {
     cout << SYMBOL_DOUBLE_BOTTOM_RIGHT << endl;
 
     // Display score
-    cout << "Score: " << score << endl;
+    cout << "Score: " << score << endl; 
 }
 
-// Function for update the game state ]
+// Function for update the game state 
 
 void Snake::UpdateGame() {
-    int prevX = tailX[0];
-    int prevY = tailY[0];
-    int prev2X, prev2Y;
-    tailX[0] = x;  // Update the head position in the tail array
-    tailY[0] = y;
+    int prevX, prevY, prev2X, prev2Y;
 
-    for (int i = 1; i < nTail; i++) {
-        prev2X = tailX[i];
-        prev2Y = tailY[i];
-        tailX[i] = prevX;
-        tailY[i] = prevY;
-        prevX = prev2X;
-        prevY = prev2Y;
-    }
+    // Only update tail if nTail > 0
+    if (nTail > 0) {
+        prevX = tailX[0];
+        prevY = tailY[0];
+        tailX[0] = x;  // Update the head position in the tail array
+        tailY[0] = y;
+
+        for (int i = 1; i < nTail; i++) {
+            prev2X = tailX[i];
+            prev2Y = tailY[i];
+            tailX[i] = prevX;
+            tailY[i] = prevY;
+            prevX = prev2X;
+            prevY = prev2Y;
+        }
+    } 
 
     switch (dir) {
         case LEFT: x--; break;
@@ -136,6 +167,8 @@ void Snake::UpdateGame() {
         fruitX = rand() % width;  // Generate new fruit position
         fruitY = rand() % height;
         nTail++;  // Increase the length of the snake
+        tailX.resize(nTail);
+        tailY.resize(nTail);
     }
 }
 
@@ -182,4 +215,8 @@ void Snake::Input() {
                 break;
         }
     }
+}
+
+bool Snake::GameOver() {
+    return game_over;
 }

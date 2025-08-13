@@ -8,6 +8,7 @@ set(CMAKE_DEPENDS_LANGUAGES
 
 # The set of dependency files which are needed:
 set(CMAKE_DEPENDS_DEPENDENCY_FILES
+  "/mnt/d/DATA/Documents/Visual-Studio-2019/C++/ascii-game/snake/src/color.cpp" "CMakeFiles/Snake.dir/src/color.cpp.o" "gcc" "CMakeFiles/Snake.dir/src/color.cpp.o.d"
   "/mnt/d/DATA/Documents/Visual-Studio-2019/C++/ascii-game/snake/src/main.cpp" "CMakeFiles/Snake.dir/src/main.cpp.o" "gcc" "CMakeFiles/Snake.dir/src/main.cpp.o.d"
   "/mnt/d/DATA/Documents/Visual-Studio-2019/C++/ascii-game/snake/src/snake.cpp" "CMakeFiles/Snake.dir/src/snake.cpp.o" "gcc" "CMakeFiles/Snake.dir/src/snake.cpp.o.d"
   "/mnt/d/DATA/Documents/Visual-Studio-2019/C++/ascii-game/snake/src/ultils.cpp" "CMakeFiles/Snake.dir/src/ultils.cpp.o" "gcc" "CMakeFiles/Snake.dir/src/ultils.cpp.o.d"
