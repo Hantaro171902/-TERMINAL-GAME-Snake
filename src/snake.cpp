@@ -43,7 +43,7 @@ Snake::Snake(int w, int h) : width(w), height(h) {
 }
 
 void Snake::Setup() {
-    set_non_blocking_input();
+    // set_non_blocking_input();
 
     game_over = false;
     dir = STOP;
@@ -173,7 +173,7 @@ void Snake::UpdateGame() {
 }
 
 int Snake::SetDifficulty() {
-    int dfc, choice;
+    int choice;
     cout << "Select difficulty level:  " << endl;
     cout << "1. Easy" << endl;
     cout << "2. Medium" << endl;
@@ -182,12 +182,11 @@ int Snake::SetDifficulty() {
     cin >> choice;
 
     switch (choice) {
-        case 1: dfc = 200; break;
-        case 2: dfc = 100; break;
-        case 3: dfc = 50; break;
-        default: dfc = 100; break;
+        case 1: return 200000; // 200ms
+        case 2: return 150000; // 150ms
+        case 3: return 50000;  // 50ms
+        default: return 100000; // 100ms
     }
-    return dfc;
 }
 
 void Snake::Input() {

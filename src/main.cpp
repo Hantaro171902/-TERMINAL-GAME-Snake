@@ -10,6 +10,7 @@
 using namespace std;
 
 int main() {
+    srand(time(nullptr));
     Snake snake(20, 17);
     snake.Setup();
     int dfc = snake.SetDifficulty();
