@@ -3,7 +3,7 @@
 #include <iostream>
 #include <vector>
 
-enum snake_direction {STOP = 0, UP, DOWN, LEFT, RIGHT };
+enum SnakeDirection {STOP = 0, UP, DOWN, LEFT, RIGHT };
 
 class Snake {
 private:
@@ -13,17 +13,17 @@ private:
     int score;
     std::vector<int> tailX, tailY; // Snake tail positions
     int nTail; // Length of the snake tail
-    snake_direction dir;
+    SnakeDirection dir;
     bool game_over;
 
 public:
     Snake(int w, int h);
-    void setup();
-    void draw();
-    void update_game();
-    void input();
-    void logic();
-    bool game_over();
-    // int getScore();
-    int set_difficulty();
+    void Setup();
+    void Draw();
+    void UpdateGame();
+    void Input();
+    // void Logic();
+    bool GameOver();
+    // int GetScore();
+    int SetDifficulty();
 };

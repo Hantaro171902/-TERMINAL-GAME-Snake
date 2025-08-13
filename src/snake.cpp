@@ -1,5 +1,6 @@
 #include "snake.hpp"
 #include "ultils.hpp"
+#include "color.hpp"
 #include <vector>
 #include <iostream>
 #include <conio.h>
@@ -19,7 +20,7 @@ Snake::Snake(int w, int h) : width(w), height(h), score(0), nTail(0), game_over(
     dir = STOP;
 }
 
-void Snake::setup() {
+void Snake::Setup() {
     game_over = false;
     dir = STOP;
     x = width / 2;
@@ -30,10 +31,107 @@ void Snake::setup() {
     nTail = 0;
 }
 
-void Snake::draw() {
+void Snake::Draw() {
     clearTerminal();
     clearScreen();
 
-    
+    setTextColor(33);
 
+    cout << R"(
+                                 _          
+                                | |         
+                 ___ ____   ____| |  _ ____ 
+                /___)  _ \ / _  | | / ) _  )
+                |___ | | | ( ( | | |< ( (/ / 
+                (___/|_| |_|\_||_|_| \_)____)
+                             
+            )" << '\n';
+
+    resetTextColor(0);
+
+    // Top border
+    cout << SYMBOL_DOUBLE_TOP_LEFT;
+    for (int i = 0; i < 2 + width; i++) {
+        cout << SYMBOL_DOUBLE_HORIZONTAL;
+    }
+    cout << SYMBOL_DOUBLE_TOP_RIGHT << endl;
+
+    for (int i = 0; i < height; i++) {
+        cout << SYMBOL_DOUBLE_VERTICAL; // Left border
+        for (int j = 0; j < width; j++) {
+            if (i == y && j == x) {
+                cout << "O"; // Snake head
+            } else if (i == fruitY && j == fruitX) {
+                cout << "*"; // Fruit
+            } else {
+                bool isTailPart = false;
+                for (int k = 0; k < nTail; k++) {
+                    if (tailX[k] == j && tailY[k] == i) {
+                        cout << "o"; // Snake tail
+                        isTailPart = true;
+                        break;
+                    }
+                }
+                if (!isTailPart) {
+                    cout << " "; // Empty space
+                }
+            }
+        }
+        cout << SYMBOL_DOUBLE_VERTICAL << endl; // Right border
+    }
+
+    //Bottom border
+    cout << SYMBOL_DOUBLE_BOTTOM_LEFT;
+    for (int i = 0; i < 2 + width; i++) {
+        cout << SYMBOL_DOUBLE_HORIZONTAL;
+    }
+    cout << SYMBOL_DOUBLE_BOTTOM_RIGHT << endl;
+
+    // Display score
+    cout << "Score: " << score << endl;
+}
+
+// Function for update the game state ]
+
+void Snake::UpdateGame() {
+    int prevX = tailX[0];
+    int prevY = tailY[0];
+    int prev2X, prev2Y;
+    tailX[0] = x;  // Update the head position in the tail array
+    tailY[0] = y;
+
+    for (int i = 1; i < nTail; i++) {
+        prev2X = tailX[i];
+        prev2Y = tailY[i];
+        tailX[i] = prevX;
+        tailY[i] = prevY;
+        prevX = prev2X;
+        prevY = prev2Y;
+    }
+
+    switch (dir) {
+        case LEFT: x--; break;
+        case RIGHT: x++; break;
+        case UP: y--; break;
+        case DOWN: y++; break;
+        default: break;
+    }
+
+    // Check for snake's collision with the walls (|) 
+    if (x >= width || x < 0 || y >= height || y < 0)
+        game_over = true;  
+
+    // Check for snake's collision with itself    
+    for (int i = 0; i < nTail; i++) {
+        if (tailX[i] == x && tailY[i] == y)
+            game_over = true;  
+    }
+
+    // Check if the snake has eaten the fruit
+    if (x == fruitX && y == fruitY) {
+        score += 10;  // Increase score
+        fruitX = rand() % width;  // Generate new fruit position
+        fruitY = rand() % height;
+        nTail++;  // Increase the length of the snake
+    }
 }
