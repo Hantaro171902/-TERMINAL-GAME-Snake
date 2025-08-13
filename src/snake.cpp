@@ -3,7 +3,6 @@
 #include "color.hpp"
 #include <vector>
 #include <iostream>
-#include <conio.h>
 #include <unistd.h>
 #include <cstdlib>
 #include <ctime>
@@ -51,7 +50,7 @@ void Snake::Draw() {
                              
             )" << '\n';
 
-    resetTextColor(0);
+    resetTextColor();
 
     // Top border
     cout << SYMBOL_DOUBLE_TOP_LEFT;

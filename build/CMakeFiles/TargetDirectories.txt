@@ -1,0 +1,3 @@
+/mnt/d/DATA/Documents/Visual-Studio-2019/C++/ascii-game/snake/build/CMakeFiles/Snake.dir
+/mnt/d/DATA/Documents/Visual-Studio-2019/C++/ascii-game/snake/build/CMakeFiles/edit_cache.dir
+/mnt/d/DATA/Documents/Visual-Studio-2019/C++/ascii-game/snake/build/CMakeFiles/rebuild_cache.dir

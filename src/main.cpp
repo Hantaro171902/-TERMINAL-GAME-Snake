@@ -15,7 +15,7 @@ int main() {
     int dfc = snake.SetDifficulty();
     // enableNonBlockingInput();
 
-    while (!snake.IsGameOver()) {
+    while (!snake.GameOver()) {
         snake.Draw();
         snake.Input();
         snake.UpdateGame();
