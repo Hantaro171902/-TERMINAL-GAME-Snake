@@ -8,19 +8,29 @@
 #include <ctime>
 #include <fcntl.h>
 #include <termios.h>
+#include <csignal>
 
 using namespace std;
+
+#define HEAD_BLOCK  "\u2589" // Full left half block
+#define TAIL_BLOCK  "\u2584" // Lower half block
 
 namespace {
     termios saved_termios;
 
     void set_non_blocking_input() {
-        termios t;
         tcgetattr(STDIN_FILENO, &saved_termios);
-        t = saved_termios;
+
+        termios t = saved_termios;
         t.c_lflag &= ~(ICANON | ECHO); // Disable canonical mode and echo
         tcsetattr(STDIN_FILENO, TCSANOW, &t);
-        fcntl(STDIN_FILENO, F_SETFL, O_NONBLOCK); // Set non-blocking mode
+        fcntl(STDIN_FILENO, F_SETFL, O_NONBLOCK); // Non-blocking
+
+        // Restore terminal on Ctrl+C
+        signal(SIGINT, [](int) {
+            tcsetattr(STDIN_FILENO, TCSANOW, &saved_termios);
+            _exit(0);
+        });
     }
     
     void reset_input() {
@@ -33,8 +43,9 @@ Snake::~Snake() {
 }
 
 Snake::Snake(int w, int h) : width(w), height(h) {
-    x = width / 2;
-    y = height / 2;
+    set_non_blocking_input();
+    x = width;
+    y = height;
     fruitX = rand() % width;
     fruitY = rand() % height;
     dir = STOP;
@@ -81,7 +92,7 @@ void Snake::Draw() {
 
     // Top border
     cout << SYMBOL_DOUBLE_TOP_LEFT;
-    for (int i = 0; i < 2 + width; i++) {
+    for (int i = 0; i < width; i++) {
         cout << SYMBOL_DOUBLE_HORIZONTAL;
     }
     cout << SYMBOL_DOUBLE_TOP_RIGHT << endl;
@@ -90,14 +101,18 @@ void Snake::Draw() {
         cout << SYMBOL_DOUBLE_VERTICAL; // Left border
         for (int j = 0; j < width; j++) {
             if (i == y && j == x) {
-                cout << "O"; // Snake head
+                setTextColor(32); // Green for head
+                cout << HEAD_BLOCK; // Snake head
+                resetTextColor();
             } else if (i == fruitY && j == fruitX) {
                 cout << "*"; // Fruit
             } else {
                 bool isTailPart = false;
                 for (int k = 0; k < nTail; k++) {
                     if (tailX[k] == j && tailY[k] == i) {
-                        cout << "o"; // Snake tail
+                        setTextColor(32); // Green for tail
+                        cout << TAIL_BLOCK;
+                        resetTextColor();
                         isTailPart = true;
                         break;
                     }
@@ -112,7 +127,7 @@ void Snake::Draw() {
 
     //Bottom border
     cout << SYMBOL_DOUBLE_BOTTOM_LEFT;
-    for (int i = 0; i < 2 + width; i++) {
+    for (int i = 0; i < width; i++) {
         cout << SYMBOL_DOUBLE_HORIZONTAL;
     }
     cout << SYMBOL_DOUBLE_BOTTOM_RIGHT << endl;

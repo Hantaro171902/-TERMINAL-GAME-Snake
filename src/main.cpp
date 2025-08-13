@@ -11,7 +11,7 @@ using namespace std;
 
 int main() {
     srand(time(nullptr));
-    Snake snake(20, 17);
+    Snake snake(40, 20);
     snake.Setup();
     int dfc = snake.SetDifficulty();
     // enableNonBlockingInput();
@@ -24,7 +24,7 @@ int main() {
     }
 
     // disableNonBlockingInput();
-    cout << "Game Over! Final score: " << snake.GetScore() << "\n";
+    cout << "Game Over! Final score: " << snake.GetScore() << endl;
     return 0;
 }
     
