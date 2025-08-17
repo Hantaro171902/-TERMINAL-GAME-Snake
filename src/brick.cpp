@@ -24,8 +24,6 @@ void Brick::generateBricks(int level) {
         brickCount = 20;    // limit bricks
     }
 
-    cout << "Generating " << brickCount << " bricks for level " << level << endl;
-
     for (int i = 0; i < brickCount; i++) {
         Position pos;
         pos.x = rand() % (width - 2) + 1; // Ensure bricks are within bounds
@@ -42,11 +40,9 @@ void Brick::generateBricks(int level) {
 
         if (!duplicate) {
             bricks.push_back(pos);
-            cout << "Added brick at (" << pos.x << ", " << pos.y << ")" << endl;
         }
     }
     active = true;
-    cout << "Total bricks generated: " << bricks.size() << endl;
 }
 
 void Brick::drawBricks() {
