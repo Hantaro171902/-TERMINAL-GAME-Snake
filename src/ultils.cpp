@@ -86,6 +86,18 @@ void hideCursor() {
 #endif
 }
 
+void showCursor() {
+#ifdef _WIN32
+    HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
+    CONSOLE_CURSOR_INFO cursorInfo;
+    GetConsoleCursorInfo(hOut, &cursorInfo);
+    cursorInfo.bVisible = true;
+    SetConsoleCursorInfo(hOut, &cursorInfo);
+#else
+    cout << "\033[?25h";
+#endif
+}
+
 int getch() {
 #ifdef _WIN32
     return _getch();

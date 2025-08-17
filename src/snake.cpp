@@ -9,6 +9,7 @@
 #include <fcntl.h>
 #include <termios.h>
 #include <csignal>
+#include <algorithm>
 
 using namespace std;
 
@@ -40,9 +41,12 @@ namespace {
 
 Snake::~Snake() {
     reset_input();
+    if (alternate_screen_active) {
+        HideAlternateScreen();
+    }
 }
 
-Snake::Snake(int w, int h) : width(w), height(h) {
+Snake::Snake(int w, int h, bool danger) : width(w), height(h), danger_mode(danger) {
     set_non_blocking_input();
     x = width;
     y = height;
@@ -51,12 +55,16 @@ Snake::Snake(int w, int h) : width(w), height(h) {
     dir = STOP;
     tailX.resize(0);
     tailY.resize(0);
+    obstacleX.resize(0);
+    obstacleY.resize(0);
+    nObstacles = 0;
+    paused = false;
+    alternate_screen_active = false;
 }
 
 void Snake::Setup() {
-    // set_non_blocking_input();
-
     game_over = false;
+    paused = false;
     dir = STOP;
     x = width / 2;
     y = height / 2;
@@ -66,10 +74,148 @@ void Snake::Setup() {
     nTail = 0;
     tailX.resize(0);
     tailY.resize(0);
+    
+    // Clear obstacles
+    obstacleX.resize(0);
+    obstacleY.resize(0);
+    nObstacles = 0;
+    
+    ShowAlternateScreen();
+}
+
+void Snake::ShowAlternateScreen() {
+    cout << "\033[?1049h\033[2J\033[H"; // Enter alternate screen, clear, home
+    alternate_screen_active = true;
+    hideCursor();
+}
+
+void Snake::HideAlternateScreen() {
+    cout << "\033[2J\033[H\033[?1049l"; // Clear, home, exit alternate screen
+    alternate_screen_active = false;
+    showCursor(); // Show cursor when exiting alternate screen
+}
+
+void Snake::ShowGameOverScreen() {
+    HideAlternateScreen();
+    
+    setTextColor(32); // Green
+    cout << R"(
+                      __    __    __    __
+                     /  \  /  \  /  \  /  \
+____________________/  __\/  __\/  __\/  __\_____________________________
+___________________/  /__/  /__/  /__/  /________________________________
+                   | / \   / \   / \   / \  \____
+                   |/   \_/   \_/   \_/   \    o \
+                                           \_____/--<
+)" << endl;
+    resetTextColor();
+    
+    cout << "\n\nThanks for playing ";
+    setTextColor(32);
+    cout << "C++ Snake";
+    resetTextColor();
+    cout << "!\n\n";
+    
+    setTextColor(35); // Magenta
+    cout << "This game was enhanced with features from Shell Snake!\n";
+    resetTextColor();
+    
+    cout << "Score: ";
+    setTextColor(33); // Yellow
+    cout << score;
+    resetTextColor();
+    cout << "   ";
+    setTextColor(32);
+    cout << "◀⚬⚬⚬";
+    resetTextColor();
+    cout << "\n\n";
 }
 
 int Snake::GetScore() {
     return score;
+}
+
+std::string Snake::GetHeadSymbol() const {
+    switch (dir) {
+        case UP: return "▲";
+        case DOWN: return "▼";
+        case LEFT: return "◀";
+        case RIGHT: return "▶";
+        default: return "●";
+    }
+}
+
+std::string Snake::GetTailSymbol() const {
+    return "⚬";
+}
+
+void Snake::TogglePause() {
+    paused = !paused;
+}
+
+void Snake::AddObstacle() {
+    if (!danger_mode) return;
+    
+    int newX, newY;
+    bool valid_position;
+    
+    do {
+        valid_position = true;
+        newX = rand() % width;
+        newY = rand() % height;
+        
+        // Don't place on snake head
+        if (newX == x && newY == y) {
+            valid_position = false;
+            continue;
+        }
+        
+        // Don't place on fruit
+        if (newX == fruitX && newY == fruitY) {
+            valid_position = false;
+            continue;
+        }
+        
+        // Don't place on snake tail
+        for (int i = 0; i < nTail; i++) {
+            if (tailX[i] == newX && tailY[i] == newY) {
+                valid_position = false;
+                break;
+            }
+        }
+        
+        // Don't place on existing obstacles
+        for (int i = 0; i < nObstacles; i++) {
+            if (obstacleX[i] == newX && obstacleY[i] == newY) {
+                valid_position = false;
+                break;
+            }
+        }
+    } while (!valid_position);
+    
+    obstacleX.push_back(newX);
+    obstacleY.push_back(newY);
+    nObstacles++;
+}
+
+void Snake::DrawObstacles() {
+    if (!danger_mode) return;
+    
+    setTextColor(34); // Blue
+    for (int i = 0; i < nObstacles; i++) {
+        move_cursor(obstacleY[i] + 3, obstacleX[i] + 2); // +3 for title, +2 for border
+        cout << "■";
+    }
+    resetTextColor();
+}
+
+bool Snake::CheckObstacleCollision(int x, int y) {
+    for (int i = 0; i < nObstacles; i++) {
+        if (obstacleX[i] == x && obstacleY[i] == y) {
+            return true;
+        }
+    }
+    return false;
 }
 
 void Snake::Draw() {
@@ -102,23 +248,38 @@ void Snake::Draw() {
         for (int j = 0; j < width; j++) {
             if (i == y && j == x) {
                 setTextColor(32); // Green for head
-                cout << HEAD_BLOCK; // Snake head
+                cout << GetHeadSymbol(); // Directional snake head
                 resetTextColor();
             } else if (i == fruitY && j == fruitX) {
-                cout << "*"; // Fruit
+                setTextColor(33); // Yellow for fruit
+                cout << "☺"; // Fruit symbol
+                resetTextColor();
             } else {
                 bool isTailPart = false;
                 for (int k = 0; k < nTail; k++) {
                     if (tailX[k] == j && tailY[k] == i) {
                         setTextColor(32); // Green for tail
-                        cout << TAIL_BLOCK;
+                        cout << GetTailSymbol();
                         resetTextColor();
                         isTailPart = true;
                         break;
                     }
                 }
                 if (!isTailPart) {
-                    cout << " "; // Empty space
+                    // Check for obstacles
+                    bool isObstacle = false;
+                    for (int k = 0; k < nObstacles; k++) {
+                        if (obstacleX[k] == j && obstacleY[k] == i) {
+                            setTextColor(34); // Blue for obstacles
+                            cout << "■";
+                            resetTextColor();
+                            isObstacle = true;
+                            break;
+                        }
+                    }
+                    if (!isObstacle) {
+                        cout << " "; // Empty space
+                    }
                 }
             }
         }
@@ -132,13 +293,22 @@ void Snake::Draw() {
     }
     cout << SYMBOL_DOUBLE_BOTTOM_RIGHT << endl;
 
-    // Display score
-    cout << "Score: " << score << endl; 
+    // Display score and status
+    setTextColor(33); // Yellow
+    cout << "Score: " << score;
+    if (paused) {
+        cout << " [PAUSED]";
+    }
+    if (danger_mode) {
+        cout << " [DANGER MODE]";
+    }
+    cout << endl;
+    resetTextColor();
 }
 
-// Function for update the game state 
-
 void Snake::UpdateGame() {
+    if (paused) return;
+    
     int prevX, prevY, prev2X, prev2Y;
 
     // Only update tail if nTail > 0
@@ -166,9 +336,13 @@ void Snake::UpdateGame() {
         default: break;
     }
 
-    // Check for snake's collision with the walls (|) 
+    // Check for snake's collision with the walls
     if (x >= width || x < 0 || y >= height || y < 0)
         game_over = true;  
+
+    // Check for snake's collision with obstacles
+    if (CheckObstacleCollision(x, y))
+        game_over = true;
 
     // Check for snake's collision with itself    
     for (int i = 0; i < nTail; i++) {
@@ -184,6 +358,11 @@ void Snake::UpdateGame() {
         nTail++;  // Increase the length of the snake
         tailX.resize(nTail);
         tailY.resize(nTail);
+        
+        // In danger mode, add an obstacle when eating fruit
+        if (danger_mode) {
+            AddObstacle();
+        }
     }
 }
 
@@ -209,19 +388,23 @@ void Snake::Input() {
         switch (getch()) {
             case 'a':
             case 'A':
-                dir = LEFT;
+                if (dir != RIGHT) dir = LEFT;
                 break;
             case 'd':
             case 'D':
-                dir = RIGHT;
+                if (dir != LEFT) dir = RIGHT;
                 break;
             case 'w':
             case 'W':
-                dir = UP;
+                if (dir != DOWN) dir = UP;
                 break;
             case 's':
             case 'S':
-                dir = DOWN;
+                if (dir != UP) dir = DOWN;
+                break;
+            case 'p':
+            case 'P':
+                TogglePause();
                 break;
             case 'x':
             case 'X':
