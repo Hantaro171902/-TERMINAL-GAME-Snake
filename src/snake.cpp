@@ -44,9 +44,10 @@ Snake::~Snake() {
     if (alternate_screen_active) {
         HideAlternateScreen();
     }
+    delete brickSystem;
 }
 
-Snake::Snake(int w, int h, bool danger) : width(w), height(h), danger_mode(danger) {
+Snake::Snake(int w, int h, bool danger, bool brick) : width(w), height(h), danger_mode(danger), brick_mode(brick) {
     set_non_blocking_input();
     x = width;
     y = height;
@@ -60,6 +61,7 @@ Snake::Snake(int w, int h, bool danger) : width(w), height(h), danger_mode(dange
     nObstacles = 0;
     paused = false;
     alternate_screen_active = false;
+    brickSystem = new Brick(width, height);
 }
 
 void Snake::Setup() {
@@ -79,6 +81,11 @@ void Snake::Setup() {
     obstacleX.resize(0);
     obstacleY.resize(0);
     nObstacles = 0;
+    
+    // Initialize brick system if enabled
+    if (brick_mode) {
+        InitializeBricks(1);
+    }
     
     ShowAlternateScreen();
 }
@@ -135,7 +142,7 @@ int Snake::GetScore() {
     return score;
 }
 
-std::string Snake::GetHeadSymbol() const {
+string Snake::GetHeadSymbol() const {
     switch (dir) {
         case UP: return "▲";
         case DOWN: return "▼";
@@ -145,7 +152,7 @@ std::string Snake::GetHeadSymbol() const {
     }
 }
 
-std::string Snake::GetTailSymbol() const {
+string Snake::GetTailSymbol() const {
     return "⚬";
 }
 
@@ -218,19 +225,45 @@ bool Snake::CheckObstacleCollision(int x, int y) {
     return false;
 }
 
+void Snake::InitializeBricks(int level) {
+    if (brickSystem) {
+        brickSystem->generateBricks(level);
+    }
+}
+
+void Snake::DrawBricks() {
+    if (brickSystem && brick_mode) {
+        brickSystem->drawBricks();
+    }
+}
+
+bool Snake::CheckBrickCollision(int x, int y) {
+    if (brickSystem && brick_mode) {
+        return brickSystem->checkCollision(x, y);
+    }
+    return false;
+}
+
+void Snake::AddRandomBrick() {
+    if (brickSystem && brick_mode) {
+        brickSystem->addRandomBrick();
+    }
+}
+
 void Snake::Draw() {
     clearTerminal();
     clearScreen();
 
-    setTextColor(33);
+    setTextColor(32);
 
     cout << R"(
-                                 _          
-                                | |         
-                 ___ ____   ____| |  _ ____ 
-                /___)  _ \ / _  | | / ) _  )
-                |___ | | | ( ( | | |< ( (/ / 
-                (___/|_| |_|\_||_|_| \_)____)
+                          __    __    __    __
+                         /  \  /  \  /  \  /  \
+    ____________________/  __\/  __\/  __\/  __\_____________________________
+    ___________________/  /__/  /__/  /__/  /________________________________
+                    | / \   / \   / \   / \  \____
+                    |/   \_/   \_/   \_/   \    o \
+                                            \_____/--<
                              
             )" << '\n';
 
@@ -278,7 +311,17 @@ void Snake::Draw() {
                         }
                     }
                     if (!isObstacle) {
-                        cout << " "; // Empty space
+                        // Check for bricks
+                        bool isBrick = false;
+                        if (brick_mode && brickSystem && brickSystem->isBrick(j, i)) {
+                            setTextColor(31); // Red for bricks
+                            cout << BLOCK_HALF;
+                            resetTextColor();
+                            isBrick = true;
+                        }
+                        if (!isBrick) {
+                            cout << " "; // Empty space
+                        }
                     }
                 }
             }
@@ -301,6 +344,9 @@ void Snake::Draw() {
     }
     if (danger_mode) {
         cout << " [DANGER MODE]";
+    }
+    if (brick_mode) {
+        cout << " [BRICK MODE]";
     }
     cout << endl;
     resetTextColor();
@@ -344,6 +390,10 @@ void Snake::UpdateGame() {
     if (CheckObstacleCollision(x, y))
         game_over = true;
 
+    // Check for snake's collision with bricks
+    if (CheckBrickCollision(x, y))
+        game_over = true;
+
     // Check for snake's collision with itself    
     for (int i = 0; i < nTail; i++) {
         if (tailX[i] == x && tailY[i] == y)
@@ -362,6 +412,11 @@ void Snake::UpdateGame() {
         // In danger mode, add an obstacle when eating fruit
         if (danger_mode) {
             AddObstacle();
+        }
+        
+        // In brick mode, add a brick when eating fruit
+        if (brick_mode) {
+            AddRandomBrick();
         }
     }
 }

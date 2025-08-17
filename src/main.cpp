@@ -15,7 +15,8 @@ void show_help() {
     cout << "Usage: ./snake [options]\n\n";
     cout << "Options:\n";
     cout << "  -h, --help     Show this help message\n";
-    cout << "  -d, --danger   Enable danger mode with obstacles\n\n";
+    cout << "  -d, --danger   Enable danger mode with obstacles\n";
+    cout << "  -b, --brick    Enable brick mode with static obstacles\n\n";
     cout << "Controls:\n";
     cout << "  WASD or Arrow Keys - Move the snake\n";
     cout << "  P - Pause/Unpause the game\n";
@@ -24,6 +25,7 @@ void show_help() {
     cout << "  - Directional snake head (▲▼▶◀)\n";
     cout << "  - Pause functionality\n";
     cout << "  - Danger mode with obstacles\n";
+    cout << "  - Brick mode with static obstacles\n";
     cout << "  - Better visual feedback\n";
     cout << "  - Improved game over screen\n\n";
     cout << "I hope wherever you are, you're having a good day!\n\n";
@@ -33,6 +35,7 @@ int main(int argc, char* argv[]) {
     srand(time(nullptr));
     
     bool danger_mode = false;
+    bool brick_mode = false;
     
     // Parse command line arguments
     for (int i = 1; i < argc; i++) {
@@ -42,6 +45,8 @@ int main(int argc, char* argv[]) {
             return 0;
         } else if (arg == "-d" || arg == "--danger") {
             danger_mode = true;
+        } else if (arg == "-b" || arg == "--brick") {
+            brick_mode = true;
         } else {
             cerr << "Unknown option: " << arg << endl;
             cerr << "Use -h or --help for usage information." << endl;
@@ -49,7 +54,8 @@ int main(int argc, char* argv[]) {
         }
     }
     
-    Snake snake(40, 60, danger_mode);
+    Snake snake(50, 20, danger_mode, brick_mode);
+    
     snake.Setup();
     int dfc = snake.SetDifficulty();
 

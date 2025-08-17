@@ -13,12 +13,14 @@ set(SOURCES
     src/ultils.cpp
     src/snake.cpp
     src/color.cpp
+    src/brick.cpp
 )
 
 set(HEADERS
     src/headers/snake.hpp
     src/headers/ultils.hpp
     src/headers/color.hpp
+    src/headers/brick.hpp
 )
 
 # Exe

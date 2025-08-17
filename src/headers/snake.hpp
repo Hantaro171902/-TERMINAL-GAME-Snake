@@ -4,6 +4,7 @@
 #include <iostream>
 #include <vector>
 #include <string>
+#include "brick.hpp"
 
 enum SnakeDirection {STOP = 0, UP, DOWN, LEFT, RIGHT };
 
@@ -26,11 +27,15 @@ private:
     std::vector<int> obstacleY;
     int nObstacles;
     
+    // Brick system
+    Brick* brickSystem;
+    bool brick_mode;
+    
     // Terminal state
     bool alternate_screen_active;
 
 public:
-    Snake(int w, int h, bool danger = false);
+    Snake(int w, int h, bool danger = false, bool brick = false);
     ~Snake();
     
     void Setup();
@@ -56,6 +61,14 @@ public:
     void AddObstacle();
     void DrawObstacles();
     bool CheckObstacleCollision(int x, int y);
+    
+    // Brick system management
+    void SetBrickMode(bool enabled) { brick_mode = enabled; }
+    bool IsBrickMode() const { return brick_mode; }
+    void InitializeBricks(int level = 1);
+    void DrawBricks();
+    bool CheckBrickCollision(int x, int y);
+    void AddRandomBrick();
     
     // Directional head symbols
     std::string GetHeadSymbol() const;

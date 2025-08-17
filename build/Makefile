@@ -129,6 +129,30 @@ Snake/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Snake.dir/build.make CMakeFiles/Snake.dir/build
 .PHONY : Snake/fast
 
+src/brick.o: src/brick.cpp.o
+.PHONY : src/brick.o
+
+# target to build an object file
+src/brick.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Snake.dir/build.make CMakeFiles/Snake.dir/src/brick.cpp.o
+.PHONY : src/brick.cpp.o
+
+src/brick.i: src/brick.cpp.i
+.PHONY : src/brick.i
+
+# target to preprocess a source file
+src/brick.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Snake.dir/build.make CMakeFiles/Snake.dir/src/brick.cpp.i
+.PHONY : src/brick.cpp.i
+
+src/brick.s: src/brick.cpp.s
+.PHONY : src/brick.s
+
+# target to generate assembly for a file
+src/brick.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Snake.dir/build.make CMakeFiles/Snake.dir/src/brick.cpp.s
+.PHONY : src/brick.cpp.s
+
 src/color.o: src/color.cpp.o
 .PHONY : src/color.o
 
@@ -234,6 +258,9 @@ help:
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
 	@echo "... Snake"
+	@echo "... src/brick.o"
+	@echo "... src/brick.i"
+	@echo "... src/brick.s"
 	@echo "... src/color.o"
 	@echo "... src/color.i"
 	@echo "... src/color.s"

@@ -9,7 +9,7 @@
 
 using namespace std;
 
-std::vector<Position> Brick::getBricks() const {
+vector<Position> Brick::getBricks() const {
     return bricks;
 }
 
@@ -20,9 +20,11 @@ Brick::Brick(int w, int h) : width(w), height(h), active(false) {
 void Brick::generateBricks(int level) {
     clearBricks(); // Clear existing bricks
     int brickCount = 1 + rand() % (level * 2); // Increase number of bricks with level  
-    if (brickCount > 10) {
-        brickCount = 10;    // limit to 10
+    if (brickCount > 20) {
+        brickCount = 20;    // limit bricks
     }
+
+    cout << "Generating " << brickCount << " bricks for level " << level << endl;
 
     for (int i = 0; i < brickCount; i++) {
         Position pos;
@@ -40,9 +42,11 @@ void Brick::generateBricks(int level) {
 
         if (!duplicate) {
             bricks.push_back(pos);
+            cout << "Added brick at (" << pos.x << ", " << pos.y << ")" << endl;
         }
     }
     active = true;
+    cout << "Total bricks generated: " << bricks.size() << endl;
 }
 
 void Brick::drawBricks() {
@@ -128,8 +132,8 @@ void Brick::addRandomBrick() {
     addBrick(newX, newY);
 }
 
-bool Brick::isValidPosition(int x, int y, const std::vector<Position>& snakeHead, 
-                           const std::vector<Position>& snakeTail, 
+bool Brick::isValidPosition(int x, int y, const vector<Position>& snakeHead, 
+                           const vector<Position>& snakeTail, 
                            const Position& fruit) const {
     // Check bounds
     if (x < 0 || x >= width || y < 0 || y >= height) {

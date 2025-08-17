@@ -1,1 +1,1 @@
-/usr/bin/c++ CMakeFiles/Snake.dir/src/main.cpp.o CMakeFiles/Snake.dir/src/ultils.cpp.o CMakeFiles/Snake.dir/src/snake.cpp.o CMakeFiles/Snake.dir/src/color.cpp.o -o Snake 
+/usr/bin/c++ CMakeFiles/Snake.dir/src/main.cpp.o CMakeFiles/Snake.dir/src/ultils.cpp.o CMakeFiles/Snake.dir/src/snake.cpp.o CMakeFiles/Snake.dir/src/color.cpp.o CMakeFiles/Snake.dir/src/brick.cpp.o -o Snake 
