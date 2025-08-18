@@ -17,8 +17,8 @@
 ## 🚀 Getting Started
 
 ``` c++
-git clone https://github.com/Hantaro171902/ascii-snake.git
-cd ascii-snake/build
+git clone https://github.com/Hantaro171902/-TERMINAL-GAME-Snake.git
+cd build
 cmake ..
 make
 ./Snake -h
